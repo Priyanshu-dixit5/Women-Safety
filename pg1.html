@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <link rel="manifest" href="manifest.json">
 
-<script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js");
-}
-</script>
+    <script>
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("service-worker.js");
+        }
+    </script>
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,7 +38,7 @@ if ("serviceWorker" in navigator) {
             left: 0;
             width: 100%;
             height: 100%;
-            background: 
+            background:
                 radial-gradient(circle at 20% 50%, rgba(220, 20, 60, 0.1) 0%, transparent 50%),
                 radial-gradient(circle at 80% 80%, rgba(139, 0, 0, 0.1) 0%, transparent 50%);
             pointer-events: none;
@@ -77,7 +78,7 @@ if ("serviceWorker" in navigator) {
         .main-title {
             font-size: 2.5em;
             margin-bottom: 10px;
-            text-shadow: 0 0 20px rgba(220, 20, 60, 0.6), 2px 2px 4px rgba(0,0,0,0.5);
+            text-shadow: 0 0 20px rgba(220, 20, 60, 0.6), 2px 2px 4px rgba(0, 0, 0, 0.5);
             background: linear-gradient(135deg, #ff1744, #dc143c, #ff1744);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -97,7 +98,7 @@ if ("serviceWorker" in navigator) {
             background: rgba(30, 30, 30, 0.95);
             border-radius: 20px;
             padding: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255, 23, 68, 0.2);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 23, 68, 0.2);
             animation: slideUp 0.8s ease-out;
             max-width: 450px;
             margin: 0 auto;
@@ -129,13 +130,33 @@ if ("serviceWorker" in navigator) {
             opacity: 0;
         }
 
-        .form-group:nth-child(1) { animation-delay: 0.1s; }
-        .form-group:nth-child(2) { animation-delay: 0.2s; }
-        .form-group:nth-child(3) { animation-delay: 0.3s; }
-        .form-group:nth-child(4) { animation-delay: 0.4s; }
-        .form-group:nth-child(5) { animation-delay: 0.5s; }
-        .form-group:nth-child(6) { animation-delay: 0.6s; }
-        .form-group:nth-child(7) { animation-delay: 0.7s; }
+        .form-group:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .form-group:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .form-group:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .form-group:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .form-group:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+
+        .form-group:nth-child(6) {
+            animation-delay: 0.6s;
+        }
+
+        .form-group:nth-child(7) {
+            animation-delay: 0.7s;
+        }
 
         .form-group label {
             display: block;
@@ -334,7 +355,7 @@ if ("serviceWorker" in navigator) {
             background: rgba(30, 30, 30, 0.95);
             border-radius: 20px;
             padding: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255, 23, 68, 0.2);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 23, 68, 0.2);
             animation: slideUp 0.8s ease-out;
             max-width: 450px;
             margin: 0 auto;
@@ -378,6 +399,7 @@ if ("serviceWorker" in navigator) {
                 opacity: 0;
                 transform: translateY(-30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -389,6 +411,7 @@ if ("serviceWorker" in navigator) {
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -400,6 +423,7 @@ if ("serviceWorker" in navigator) {
                 opacity: 0;
                 transform: translateX(-10px);
             }
+
             to {
                 opacity: 1;
                 transform: translateX(0);
@@ -407,18 +431,24 @@ if ("serviceWorker" in navigator) {
         }
 
         @keyframes pulse {
-            0%, 100% {
+
+            0%,
+            100% {
                 box-shadow: 0 8px 35px rgba(220, 20, 60, 0.5), 0 0 20px rgba(255, 23, 68, 0.3);
             }
+
             50% {
                 box-shadow: 0 8px 35px rgba(220, 20, 60, 0.8), 0 0 30px rgba(255, 23, 68, 0.6);
             }
         }
 
         @keyframes gradientShift {
-            0%, 100% {
+
+            0%,
+            100% {
                 background-position: 0% center;
             }
+
             50% {
                 background-position: 100% center;
             }
@@ -429,6 +459,7 @@ if ("serviceWorker" in navigator) {
                 opacity: 0;
                 transform: scale(0.5);
             }
+
             to {
                 opacity: 1;
                 transform: scale(1);
@@ -439,18 +470,19 @@ if ("serviceWorker" in navigator) {
             .container {
                 padding: 10px;
             }
-            
+
             .form-container,
             .success-page {
                 padding: 30px 20px;
             }
-            
+
             .main-title {
                 font-size: 2em;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -517,7 +549,7 @@ if ("serviceWorker" in navigator) {
                     <label for="registerEmail">Email Address</label>
                     <input type="email" id="registerEmail" name="email" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="registerSecurityQuestion">Security Question</label>
                     <select id="registerSecurityQuestion" name="securityQuestion" required>
@@ -612,18 +644,18 @@ if ("serviceWorker" in navigator) {
 
     <script>
         // API Configuration
-        const API_BASE_URL = 'http://127.0.0.1:5000/api';
-        
+        const API_BASE_URL = 'https://women-safety-bhws.onrender.com/api';
+
         // Check if running through Flask server or direct file access
         const isFlaskServer = window.location.protocol === 'http:' || window.location.protocol === 'https:';
-        
+
         // Redirect if already logged in (only for direct file access)
         if (!isFlaskServer) {
-            (function(){
-                try { if (localStorage.getItem('safeguard_logged_in')) { window.location.replace('index.html'); } } catch(e){}
+            (function () {
+                try { if (localStorage.getItem('safeguard_logged_in')) { window.location.replace('index.html'); } } catch (e) { }
             })();
         }
-        
+
         let currentUser = null;
 
         // Security questions mapping
@@ -645,24 +677,24 @@ if ("serviceWorker" in navigator) {
                         'Content-Type': 'application/json',
                     }
                 };
-                
+
                 if (data) {
                     options.body = JSON.stringify(data);
                 }
-                
+
                 const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
-                
+
                 // Handle network errors
                 if (!response.ok && response.status === 0) {
                     throw new Error('Cannot connect to server. Please make sure the Flask server is running on http://127.0.0.1:5000');
                 }
-                
+
                 const result = await response.json();
-                
+
                 if (!response.ok) {
                     throw new Error(result.message || 'Request failed');
                 }
-                
+
                 return result;
             } catch (error) {
                 console.error('API Error:', error);
@@ -677,7 +709,7 @@ if ("serviceWorker" in navigator) {
         // Check server connection on page load
         async function checkServerConnection() {
             try {
-                const response = await fetch('http://127.0.0.1:5000/');
+                const response = await fetch('https://women-safety-bhws.onrender.com/');
                 if (response.ok) {
                     console.log('✅ Connected to Flask backend');
                     return true;
@@ -725,7 +757,7 @@ if ("serviceWorker" in navigator) {
         function togglePassword(fieldId) {
             const field = document.getElementById(fieldId);
             const toggle = field.nextElementSibling;
-            
+
             if (field.type === 'password') {
                 field.type = 'text';
                 toggle.textContent = '🙈';
@@ -743,19 +775,19 @@ if ("serviceWorker" in navigator) {
             if (/[a-z]/.test(password)) strength++;
             if (/[0-9]/.test(password)) strength++;
             if (/[^A-Za-z0-9]/.test(password)) strength++;
-            
+
             return strength;
         }
 
         // Update password strength indicator
-        document.getElementById('registerPassword').addEventListener('input', function() {
+        document.getElementById('registerPassword').addEventListener('input', function () {
             const password = this.value;
             const strengthBar = document.querySelector('.password-strength');
             const strengthText = document.getElementById('strengthText');
             const strength = checkPasswordStrength(password);
-            
+
             strengthBar.className = 'password-strength';
-            
+
             if (strength < 3) {
                 strengthBar.classList.add('strength-weak');
                 strengthText.textContent = 'Weak';
@@ -774,16 +806,16 @@ if ("serviceWorker" in navigator) {
             alertDiv.textContent = message;
             alertDiv.className = `alert alert-${type}`;
             alertDiv.classList.remove('hidden');
-            
+
             setTimeout(() => {
                 alertDiv.classList.add('hidden');
             }, 5000);
         }
 
         // Registration form handler
-        document.getElementById('registerFormElement').addEventListener('submit', async function(e) {
+        document.getElementById('registerFormElement').addEventListener('submit', async function (e) {
             e.preventDefault();
-            
+
             const formData = new FormData(this);
             const userData = {
                 username: formData.get('username'),
@@ -808,9 +840,9 @@ if ("serviceWorker" in navigator) {
 
             try {
                 const result = await apiRequest('/register', 'POST', userData);
-                
+
                 showAlert('registerAlert', 'Account created successfully! You can now login with your username.', 'success');
-                
+
                 // Auto-fill login form and switch to login
                 setTimeout(() => {
                     document.getElementById('loginUsername').value = userData.username;
@@ -825,9 +857,9 @@ if ("serviceWorker" in navigator) {
         });
 
         // Login form handler
-        document.getElementById('loginFormElement').addEventListener('submit', async function(e) {
+        document.getElementById('loginFormElement').addEventListener('submit', async function (e) {
             e.preventDefault();
-            
+
             const formData = new FormData(this);
             const username = formData.get('username');
             const password = formData.get('password');
@@ -840,14 +872,14 @@ if ("serviceWorker" in navigator) {
 
             try {
                 const result = await apiRequest('/login', 'POST', { username, password });
-                
+
                 if (result.status === 'success') {
                     currentUser = result.user;
                     // Store user info in localStorage for session management
                     try {
                         localStorage.setItem('safeguard_logged_in', '1');
                         localStorage.setItem('safeguard_user', JSON.stringify(result.user));
-                    } catch(e) {
+                    } catch (e) {
                         console.error('LocalStorage error:', e);
                     }
                     showSuccessPage();
@@ -865,7 +897,7 @@ if ("serviceWorker" in navigator) {
         // Verify user for password reset
         async function verifyUser() {
             const email = document.getElementById('forgotEmail').value;
-            
+
             if (!email) {
                 showAlert('forgotAlert', 'Please enter your email address.', 'error');
                 return;
@@ -878,11 +910,11 @@ if ("serviceWorker" in navigator) {
 
             try {
                 const result = await apiRequest('/verify-email', 'POST', { email });
-                
+
                 if (result.status === 'success') {
                     const questionKey = result.securityQuestion;
                     const questionText = securityQuestions[questionKey] || questionKey;
-                    
+
                     document.getElementById('securityQuestionText').textContent = questionText;
                     document.getElementById('securityQuestionSection').classList.remove('hidden');
                     showAlert('forgotAlert', 'Identity verified! Please answer your security question.', 'success');
@@ -898,9 +930,9 @@ if ("serviceWorker" in navigator) {
         }
 
         // Forgot password form handler
-        document.getElementById('forgotPasswordFormElement').addEventListener('submit', async function(e) {
+        document.getElementById('forgotPasswordFormElement').addEventListener('submit', async function (e) {
             e.preventDefault();
-            
+
             const email = document.getElementById('forgotEmail').value;
             const securityAnswer = document.getElementById('securityAnswerInput').value.toLowerCase();
             const newPassword = document.getElementById('newPassword').value;
@@ -923,10 +955,10 @@ if ("serviceWorker" in navigator) {
                     securityAnswer: securityAnswer,
                     newPassword: newPassword
                 });
-                
+
                 if (result.status === 'success') {
                     showAlert('forgotAlert', 'Password reset successfully! You can now login with your new password.', 'success');
-                    
+
                     // Get username from email (we'll need to fetch it or store it)
                     // For now, just redirect to login
                     setTimeout(() => {
@@ -944,12 +976,13 @@ if ("serviceWorker" in navigator) {
         });
 
         // After success page, go to main UI
-        (function(){
+        (function () {
             const successBtn = document.querySelector('#successPage .btn-primary');
-            successBtn.addEventListener('click', function(){
+            successBtn.addEventListener('click', function () {
                 window.location.replace('index.html');
             });
         })();
     </script>
 </body>
+
 </html>
