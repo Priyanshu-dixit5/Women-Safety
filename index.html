@@ -1,0 +1,2136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="manifest" href="manifest.json">
+
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("service-worker.js");
+}
+</script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAFEGUARD🛡 - Women Safety Application</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a0000 0%, #2d0a0a 50%, #1a0000 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(10, 10, 10, 0.86);
+            padding: 0.8rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(220, 20, 60, 0.25);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(220, 20, 60, 0.18);
+        }
+
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #ff3355, #dc143c);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 18px rgba(220, 20, 60, 0.35);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #eaeaea;
+            text-decoration: none;
+            transition: color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+            padding: 0.5rem 0.9rem;
+            border-radius: 10px;
+            position: relative;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: #ffffff;
+            background: rgba(220, 20, 60, 0.08);
+        }
+        .nav-links a.active {
+            color: #ffb3b3;
+            background: rgba(220, 20, 60, 0.14);
+            box-shadow: 0 0 0 1px rgba(220, 20, 60, 0.22) inset, 0 6px 18px rgba(220, 20, 60, 0.18);
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            left: 14px;
+            right: 14px;
+            bottom: -8px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #dc143c, transparent);
+            opacity: 0;
+            transform: scaleX(0.6);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        .nav-links a:hover::after, .nav-links a.active::after {
+            opacity: 1;
+            transform: scaleX(1);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Dashboard Page */
+        .hero {
+            text-align: center;
+            padding: 3rem 0;
+            background: linear-gradient(135deg, rgba(220, 20, 60, 0.1), rgba(0, 0, 0, 0.3));
+            border-radius: 20px;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 40px rgba(220, 20, 60, 0.2);
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px rgba(220, 20, 60, 0.5);
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            color: #ffb3b3;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, rgba(220, 20, 60, 0.15), rgba(0, 0, 0, 0.5));
+            padding: 2rem;
+            border-radius: 15px;
+            border: 2px solid rgba(220, 20, 60, 0.3);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(220, 20, 60, 0.4);
+            border-color: #dc143c;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            color: #dc143c;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        /* SOS Button */
+        .sos-container {
+            text-align: center;
+            margin: 3rem 0;
+        }
+
+        .sos-button {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ff0000, #8b0000);
+            border: 5px solid #fff;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.6);
+            position: relative;
+            animation: pulse 2s infinite;
+        }
+
+        .sos-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 50px rgba(255, 0, 0, 0.9);
+        }
+
+        .sos-button:active {
+            transform: scale(0.95);
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 30px rgba(255, 0, 0, 0.6); }
+            50% { box-shadow: 0 0 50px rgba(255, 0, 0, 0.9); }
+        }
+
+        /* Contacts Section */
+        .section-title {
+            color: #dc143c;
+            font-size: 2rem;
+            margin: 2rem 0 1rem 0;
+            text-align: center;
+        }
+
+        .add-contact-form {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 2rem;
+            border-radius: 15px;
+            border: 2px solid rgba(220, 20, 60, 0.3);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #ffb3b3;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid rgba(220, 20, 60, 0.3);
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #dc143c;
+        }
+
+        .btn {
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #dc143c;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #b00020;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(220, 20, 60, 0.4);
+        }
+
+        .contacts-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .contact-card {
+            background: linear-gradient(135deg, rgba(220, 20, 60, 0.1), rgba(0, 0, 0, 0.5));
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 2px solid rgba(220, 20, 60, 0.3);
+            position: relative;
+        }
+
+        .contact-card h4 {
+            color: #dc143c;
+            margin-bottom: 0.5rem;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff0000;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .delete-btn:hover {
+            background: #8b0000;
+        }
+
+        /* Routes Section */
+        .routes-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .route-card {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 2px solid rgba(220, 20, 60, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            position: relative;
+            gap: 1rem;
+        }
+
+        /* Safety Tips */
+        .tips-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .tip-card {
+            background: linear-gradient(135deg, rgba(220, 20, 60, 0.1), rgba(0, 0, 0, 0.5));
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 5px solid #dc143c;
+        }
+
+        .tip-card h4 {
+            color: #dc143c;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Police Stations */
+        .station-card {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 2px solid rgba(220, 20, 60, 0.3);
+            margin-bottom: 1rem;
+        }
+
+        .station-card h4 {
+            color: #dc143c;
+            margin-bottom: 0.5rem;
+        }
+
+        .distance {
+            color: #ffb3b3;
+            font-size: 0.9rem;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #dc143c, #8b0000);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid rgba(220, 20, 60, 0.5);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(220, 20, 60, 0.5);
+        }
+
+        .action-btn-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00ff00;
+            margin-right: 0.5rem;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                gap: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        /* Live Map */
+        #liveMap {
+            width: 100%;
+            height: 420px;
+            border-radius: 12px;
+            border: 2px solid rgba(220, 20, 60, 0.3);
+            box-shadow: 0 10px 30px rgba(220, 20, 60, 0.25);
+            overflow: hidden;
+        }
+    </style>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+</head>
+<body>
+    <script>
+        // API Configuration
+        const API_BASE_URL = 'http://127.0.0.1:5000/api';
+        
+        // Get current user from localStorage (set during login)
+        let currentUser = null;
+        try {
+            const userStr = localStorage.getItem('safeguard_user');
+            if (userStr) {
+                currentUser = JSON.parse(userStr);
+            }
+        } catch (e) {
+            console.error('Error loading user:', e);
+        }
+        
+        // Check login status
+        (function(){
+            try {
+                if (!localStorage.getItem('safeguard_logged_in') || !currentUser) {
+                    window.location.replace('pg1.html');
+                }
+            } catch (e) {}
+        })();
+        
+        // API Helper Functions
+        async function apiRequest(endpoint, method = 'GET', data = null) {
+            try {
+                const options = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                };
+                
+                if (data) {
+                    options.body = JSON.stringify(data);
+                }
+                
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+                
+                if (!response.ok && response.status === 0) {
+                    throw new Error('Cannot connect to server. Please make sure Flask server is running.');
+                }
+                
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.message || 'Request failed');
+                }
+                
+                return result;
+            } catch (error) {
+                console.error('API Error:', error);
+                if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                    throw new Error('Cannot connect to server. Please make sure Flask server is running on http://127.0.0.1:5000');
+                }
+                throw error;
+            }
+        }
+        
+        // Check server connection
+        async function checkServerConnection() {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/health');
+                if (response.ok) {
+                    console.log('✅ Connected to Flask backend');
+                    return true;
+                }
+            } catch (error) {
+                console.warn('⚠️ Flask server not running. Some features may not work.');
+                return false;
+            }
+        }
+        
+        // Check connection on page load
+        checkServerConnection();
+    </script>
+    <nav class="navbar">
+        <div class="logo">SAFEGUARD🛡</div>
+        <ul class="nav-links">
+            <li><a href="#" class="nav-link active" data-page="dashboard">Dashboard</a></li>
+            <li><a href="#" class="nav-link" data-page="sos">SOS</a></li>
+            <li><a href="#" class="nav-link" data-page="live">Live Location</a></li>
+            <li><a href="#" class="nav-link" data-page="contacts">Contacts</a></li>
+            <li><a href="#" class="nav-link" data-page="routes">Safe Routes</a></li>
+            <li><a href="#" class="nav-link" data-page="tips">Safety Tips</a></li>
+            <li><a href="#" class="nav-link" data-page="police">Police Stations</a></li>
+            <li><a href="#" class="nav-link" data-page="camera">Camera</a></li>
+            <li><a href="#" class="nav-link" onclick="logoutSafeguard()">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <!-- Dashboard Page -->
+        <div id="dashboard" class="page active">
+            <div class="hero">
+                <h1>SAFEGUARD🛡</h1>
+                <p>Your Personal Safety Companion - Always Ready, Always There</p>
+            </div>
+
+            <h2 class="section-title">About SAFEGUARD</h2>
+            <div class="feature-card" style="max-width: 900px; margin: 0 auto 3rem auto;">
+                <p style="line-height: 1.8; font-size: 1.1rem;">
+                    <strong>SAFEGUARD🛡</strong> is a comprehensive women safety application designed to provide instant help and peace of mind. 
+                    With one-touch SOS functionality, real-time location sharing, and intelligent safety features, SAFEGUARD ensures you're never alone. 
+                    Whether you're walking home late, traveling to a new place, or just want the security of knowing help is one tap away, 
+                    SAFEGUARD has your back 24/7. Our mission is to empower women with technology that can potentially save lives.
+                </p>
+            </div>
+
+            <h2 class="section-title">Key Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🚨</div>
+                    <h3>One-Touch SOS</h3>
+                    <p>Instantly alert your emergency contacts with your location and trigger an alarm with a single tap.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📍</div>
+                    <h3>Live Location Sharing</h3>
+                    <p>Share your real-time location with trusted contacts via WhatsApp, SMS, or Email. Continuous auto-tracking available!</p>
+                    <p style="margin-top: 0.5rem; color: #00ff00; font-size: 0.9rem;">✨ NEW: Auto-share every 2 minutes</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">👥</div>
+                    <h3>Emergency Contacts</h3>
+                    <p>Manage a list of trusted contacts who will receive instant alerts during emergencies.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🛣️</div>
+                    <h3>Safe Routes</h3>
+                    <p>Save frequently traveled routes like home, work, and get notified if you deviate from them.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📸</div>
+                    <h3>Instant Camera</h3>
+                    <p>Quick access to camera for evidence collection during unsafe situations.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🚔</div>
+                    <h3>Nearby Police Stations</h3>
+                    <p>Find the nearest police stations based on your real-time location with directions, distance, and contact information.</p>
+                    <p style="margin-top: 0.5rem; color: #00ff00; font-size: 0.9rem;">✨ NEW: Live GPS-based search</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💡</div>
+                    <h3>Safety Tips</h3>
+                    <p>Access expert safety tips and guidelines for various situations.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔊</div>
+                    <h3>Loud Alarm</h3>
+                    <p>Trigger a loud alarm to draw attention and deter potential threats.</p>
+                </div>
+            </div>
+
+            <h2 class="section-title">Quick Actions</h2>
+            <div class="quick-actions">
+                <div class="action-btn" onclick="navigateToPage('sos')">
+                    <div class="action-btn-icon">🚨</div>
+                    <h3>Emergency SOS</h3>
+                </div>
+                <div class="action-btn" onclick="shareLocation()">
+                    <div class="action-btn-icon">📍</div>
+                    <h3>Share Location</h3>
+                </div>
+                <div class="action-btn" onclick="navigateToPage('camera')">
+                    <div class="action-btn-icon">📸</div>
+                    <h3>Quick Camera</h3>
+                </div>
+                <div class="action-btn" onclick="navigateToPage('police')">
+                    <div class="action-btn-icon">🚔</div>
+                    <h3>Find Police</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- SOS Page -->
+        <div id="sos" class="page">
+            <h2 class="section-title">Emergency SOS System</h2>
+            <div class="sos-container">
+                <p style="margin-bottom: 2rem; font-size: 1.2rem;">
+                    <span class="status-indicator"></span>System Active - Press and Hold for 3 seconds to trigger SOS
+                </p>
+                <button class="sos-button" id="sosButton">
+                    SOS<br>🚨
+                </button>
+                <p style="margin-top: 2rem; color: #ffb3b3;">
+                    Your location and emergency message will be sent to all saved contacts
+                </p>
+            </div>
+
+            <div style="max-width: 800px; margin: 3rem auto;">
+                <h3 style="color: #dc143c; margin-bottom: 1rem;">What happens when you trigger SOS?</h3>
+                <div class="tips-grid">
+                    <div class="tip-card">
+                        <h4>📱 SMS Alerts</h4>
+                        <p>Emergency SMS with your location sent to all emergency contacts</p>
+                    </div>
+                    <div class="tip-card">
+                        <h4>🔊 Loud Alarm</h4>
+                        <p>High-volume alarm activated to draw attention and deter threats</p>
+                    </div>
+                    <div class="tip-card">
+                        <h4>📍 Location Tracking</h4>
+                        <p>Continuous location updates sent to emergency contacts</p>
+                    </div>
+                    <div class="tip-card">
+                        <h4>📸 Auto Recording</h4>
+                        <p>Camera activated for evidence collection (if enabled)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Location Page -->
+        <div id="live" class="page">
+            <h2 class="section-title">Live Location</h2>
+            <div style="max-width: 1000px; margin: 0 auto;">
+                <div id="liveMap"></div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                    <div class="tip-card"><h4>Latitude</h4><p id="liveLat">–</p></div>
+                    <div class="tip-card"><h4>Longitude</h4><p id="liveLng">–</p></div>
+                    <div class="tip-card"><h4>Accuracy</h4><p id="liveAcc">–</p></div>
+                    <div class="tip-card"><h4>Speed</h4><p id="liveSpeed">–</p></div>
+                </div>
+                
+                <h3 style="color: #dc143c; margin: 2rem 0 1rem 0; text-align: center;">📲 Share Real-Time Location</h3>
+                <div style="text-align: center; margin: 1rem 0;">
+                    <p id="trackingStatus" style="color: #ffb3b3; font-size: 1rem;">
+                        Share your current location instantly with your contacts
+                    </p>
+                </div>
+                <div class="quick-actions" style="margin-top: 1rem;">
+                    <div class="action-btn" onclick="shareViaWhatsApp()">
+                        <div class="action-btn-icon">💬</div>
+                        <h3>Share via WhatsApp</h3>
+                    </div>
+                    <div class="action-btn" onclick="shareViaSMS()">
+                        <div class="action-btn-icon">📱</div>
+                        <h3>Share via SMS</h3>
+                    </div>
+                    <div class="action-btn" onclick="shareViaEmail()">
+                        <div class="action-btn-icon">📧</div>
+                        <h3>Share via Email</h3>
+                    </div>
+                    <div class="action-btn" onclick="shareToAllContacts()">
+                        <div class="action-btn-icon">👥</div>
+                        <h3>Share to All Contacts</h3>
+                    </div>
+                </div>
+                
+                <h3 style="color: #dc143c; margin: 2rem 0 1rem 0; text-align: center;">🔄 Continuous Tracking</h3>
+                <div class="quick-actions" style="margin-top: 1rem;">
+                    <div class="action-btn" onclick="startContinuousTracking()" id="startTrackBtn">
+                        <div class="action-btn-icon">▶️</div>
+                        <h3>Start Auto-Share</h3>
+                    </div>
+                    <div class="action-btn" onclick="stopContinuousTracking()" id="stopTrackBtn" style="display: none; background: linear-gradient(135deg, #8b0000, #dc143c);">
+                        <div class="action-btn-icon">⏸️</div>
+                        <h3>Stop Auto-Share</h3>
+                    </div>
+                </div>
+                <p style="text-align: center; margin-top: 1rem; color: #ffb3b3; font-size: 0.9rem;">
+                    💡 Tip: Auto-Share sends your location every 2 minutes via WhatsApp
+                </p>
+                
+                <div class="quick-actions" style="margin-top: 1rem;">
+                    <div class="action-btn" onclick="copyLiveLink()">
+                        <div class="action-btn-icon">🔗</div>
+                        <h3>Copy Maps Link</h3>
+                    </div>
+                    <div class="action-btn" onclick="openLiveInMaps()">
+                        <div class="action-btn-icon">🗺️</div>
+                        <h3>Open in Google Maps</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Camera Page -->
+        <div id="camera" class="page">
+            <h2 class="section-title">Instant Camera & Video Recording</h2>
+            <div style="max-width: 1000px; margin: 0 auto;">
+                <div style="background: rgba(0,0,0,0.5); padding: 1rem; border-radius: 12px; border: 2px solid rgba(220,20,60,0.3);">
+                    <video id="camVideo" autoplay playsinline muted style="width:100%; max-height:420px; background:#000; border-radius: 8px;"></video>
+                    <canvas id="camCanvas" style="display:none"></canvas>
+                    <div id="recordingIndicator" style="display:none; text-align:center; margin:10px 0; color:#ff1744; font-weight:bold; font-size:1.2em;">
+                        🔴 RECORDING...
+                    </div>
+                    <div style="text-align:center; margin:10px 0;">
+                        <span id="cameraStatus" style="color:#ffb3b3; font-size:0.9em;">📷 Camera: Rear</span>
+                    </div>
+                    <div class="quick-actions" style="margin-top: 1rem; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));">
+                        <div class="action-btn" onclick="startCamera()"><div class="action-btn-icon">📷</div><h3>Open Camera</h3></div>
+                        <div class="action-btn" id="switchCameraBtn" onclick="switchCamera()" style="background: linear-gradient(135deg, #4a90e2, #357abd);"><div class="action-btn-icon">🔄</div><h3>Switch Camera</h3></div>
+                        <div class="action-btn" onclick="capturePhoto()"><div class="action-btn-icon">📸</div><h3>Capture Photo</h3></div>
+                        <div class="action-btn" id="recordVideoBtn" onclick="startVideoRecording()" style="background: linear-gradient(135deg, #28a745, #20c997);"><div class="action-btn-icon">🎥</div><h3>Record Video</h3></div>
+                        <div class="action-btn" id="stopRecordBtn" onclick="stopVideoRecording()" style="display:none; background: linear-gradient(135deg, #dc143c, #8b0000);"><div class="action-btn-icon">⏹️</div><h3>Stop Recording</h3></div>
+                        <div class="action-btn" onclick="stopCamera()"><div class="action-btn-icon">🛑</div><h3>Close Camera</h3></div>
+                        <div class="action-btn" onclick="clearAllMedia()"><div class="action-btn-icon">🗑️</div><h3>Clear All</h3></div>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2rem;">
+                    <div>
+                        <h3 style="color:#dc143c; margin-bottom: 0.8rem;">📸 Saved Photos</h3>
+                        <div id="photoGallery" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px;"></div>
+                    </div>
+                    <div>
+                        <h3 style="color:#dc143c; margin-bottom: 0.8rem;">🎥 Saved Videos</h3>
+                        <div id="videoGallery" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contacts Page -->
+        <div id="contacts" class="page">
+            <h2 class="section-title">Emergency Contacts</h2>
+            
+            <div class="add-contact-form">
+                <h3 style="color: #dc143c; margin-bottom: 1.5rem;">Add New Contact</h3>
+                <div class="form-group">
+                    <label>Contact Name</label>
+                    <input type="text" id="contactName" placeholder="Enter name">
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="contactPhone" placeholder="Enter phone number">
+                </div>
+                <div class="form-group">
+                    <label>Relationship</label>
+                    <input type="text" id="contactRelation" placeholder="e.g., Mother, Friend, Colleague">
+                </div>
+                <button class="btn btn-primary" onclick="addContact()">Add Contact</button>
+            </div>
+
+            <h3 style="color: #dc143c; margin: 2rem 0 1rem 0;">Saved Contacts (<span id="contactCount">0</span>)</h3>
+            <div class="contacts-list" id="contactsList">
+                <!-- Contacts will be added here dynamically -->
+            </div>
+        </div>
+
+        <!-- Routes Page -->
+        <div id="routes" class="page">
+            <h2 class="section-title">Safe Routes</h2>
+            
+            <div class="add-contact-form">
+                <h3 style="color: #dc143c; margin-bottom: 1.5rem;">Add New Safe Route</h3>
+                <div class="form-group">
+                    <label>Route Name</label>
+                    <input type="text" id="routeName" placeholder="e.g., Home, Office, Gym">
+                </div>
+                <div class="form-group">
+                    <label>Address</label>
+                    <input type="text" id="routeAddress" placeholder="Enter full address">
+                </div>
+                <button class="btn btn-primary" onclick="addRoute()">Save Route</button>
+            </div>
+
+            <h3 style="color: #dc143c; margin: 2rem 0 1rem 0;">Saved Routes</h3>
+            <div class="routes-list" id="routesList">
+                <!-- Routes will be added here dynamically -->
+            </div>
+        </div>
+
+        <!-- Safety Tips Page -->
+        <div id="tips" class="page">
+            <h2 class="section-title">Safety Tips & Guidelines</h2>
+            
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <h4>🚶‍♀️ Walking Alone</h4>
+                    <p>• Stay in well-lit, populated areas<br>
+                    • Keep your phone charged and accessible<br>
+                    • Walk with confidence and purpose<br>
+                    • Trust your instincts - if something feels wrong, it probably is<br>
+                    • Share your location with trusted contacts</p>
+                </div>
+
+                <div class="tip-card">
+                    <h4>🚕 Using Transportation</h4>
+                    <p>• Verify driver details before entering vehicle<br>
+                    • Share ride details with family or friends<br>
+                    • Sit in the back seat<br>
+                    • Keep emergency contacts on speed dial<br>
+                    • Note the vehicle registration number</p>
+                </div>
+
+                <div class="tip-card">
+                    <h4>🏠 At Home</h4>
+                    <p>• Keep doors and windows locked<br>
+                    • Install proper lighting around your home<br>
+                    • Know your neighbors<br>
+                    • Have emergency numbers readily available<br>
+                    • Install a peephole or security camera</p>
+                </div>
+
+                <div class="tip-card">
+                    <h4>📱 Digital Safety</h4>
+                    <p>• Don't share personal information publicly<br>
+                    • Be cautious of unknown friend requests<br>
+                    • Disable location services on social media<br>
+                    • Use strong, unique passwords<br>
+                    • Report harassment or threats immediately</p>
+                </div>
+
+                <div class="tip-card">
+                    <h4>👥 In Crowds</h4>
+                    <p>• Stay alert and aware of surroundings<br>
+                    • Keep valuables secure and hidden<br>
+                    • Stay with your group<br>
+                    • Identify exits and safe spaces<br>
+                    • Have a meeting point in case you get separated</p>
+                </div>
+
+                <div class="tip-card">
+                    <h4>🌙 At Night</h4>
+                    <p>• Avoid isolated areas and shortcuts<br>
+                    • Walk facing traffic to see approaching vehicles<br>
+                    • Don't wear headphones - stay alert<br>
+                    • Carry a whistle or personal alarm<br>
+                    • Let someone know your route and ETA</p>
+                </div>
+
+                <div class="tip-card">
+                    <h4>⚠️ Emergency Situations</h4>
+                    <p>• Call emergency services (100/112) immediately<br>
+                    • Use SAFEGUARD's SOS feature<br>
+                    • Make noise to attract attention<br>
+                    • Try to remember attacker's description<br>
+                    • Seek help from nearby shops or houses</p>
+                </div>
+
+                <div class="tip-card">
+                    <h4>💪 Self-Defense Basics</h4>
+                    <p>• Consider taking self-defense classes<br>
+                    • Target vulnerable areas: eyes, nose, throat, groin<br>
+                    • Use whatever you have as a weapon<br>
+                    • Make noise and draw attention<br>
+                    • Your safety is more important than possessions</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Police Stations Page (India) -->
+        <div id="police" class="page">
+            <h2 class="section-title">Nearby Police Stations</h2>
+            <p style="text-align: center; margin-bottom: 1rem; color: #ffb3b3;">
+                India Helplines: 112 (ERSS), 100 (Police), 1091 (Women), 181 (Women Helpline)
+            </p>
+            <div class="quick-actions" style="margin-top: 0;">
+                <div class="action-btn" onclick="findNearbyPoliceStations()">
+                    <div class="action-btn-icon">🔍</div>
+                    <h3>Find Nearby Stations</h3>
+                </div>
+                <div class="action-btn" onclick="openMapsNearMe('police station near me')">
+                    <div class="action-btn-icon">🗺️</div>
+                    <h3>Open in Maps</h3>
+                </div>
+                <div class="action-btn" onclick="dialNumber('112')">
+                    <div class="action-btn-icon">📞</div>
+                    <h3>Call 112</h3>
+                </div>
+                <div class="action-btn" onclick="dialNumber('1091')">
+                    <div class="action-btn-icon">👮‍♀️</div>
+                    <h3>Women Helpline 1091</h3>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin: 1.5rem 0;">
+                <p id="policeStatus" style="color: #ffb3b3; font-size: 1.1rem;">
+                    <span class="status-indicator"></span>Click "Find Nearby Stations" to locate police stations near you
+                </p>
+            </div>
+            
+            <div id="policeStations">
+                <!-- Police stations will be loaded here dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <audio id="sosAlarm" loop>
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUKvk8LZkGwY5k9nyz3wvBSl+zPLahDoMGGe58OKYTAwNUKzl8LdlHAU6lNry0YEwBSh9y/LciTsLF2a48OScTQwOUKzl8LdlGwY6lNry0YExBSd8yvLdiToMGGe58OSbTAwOT6vl8LdlHAU6ldnzz4ExBSh8yfPejTsLGGe58OKaTAwNUKzl8LhlHAU6ltnyz34wBSh8yfPejjsLGGS38OScTgwNTqrl8LdlGwU5ldny0YEwBSh8yfPejTsLF2W48OScTAwNT6vk8LdlHAU6lNny0YExBSh8yfPejjsLGGa58OKbTAwNUKrl8LhlGwU5ldny0IAx" type="audio/wav">
+    </audio>
+
+    <script>
+        // Navigation
+        const navLinks = document.querySelectorAll('.nav-link');
+        const pages = document.querySelectorAll('.page');
+        let liveWatchId = null;
+        let liveMap = null;
+        let liveMarker = null;
+        let liveAccuracy = null;
+        let livePath = null;
+        let livePositions = [];
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetPage = link.dataset.page;
+                
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                
+                pages.forEach(p => p.classList.remove('active'));
+                document.getElementById(targetPage).classList.add('active');
+
+                if (targetPage === 'live') {
+                    initLiveMap();
+                    startLiveWatch();
+                } else {
+                    stopLiveWatch();
+                }
+
+                if (targetPage === 'camera') {
+                    startCamera();
+                    renderGallery();
+                    renderVideoGallery();
+                } else {
+                    stopCamera();
+                }
+                
+                // Auto-load police stations when police page is opened
+                if (targetPage === 'police') {
+                    // Only auto-load if stations haven't been loaded yet
+                    const stationsEl = document.getElementById('policeStations');
+                    if (stationsEl && stationsEl.innerHTML.trim() === '') {
+                        // Wait a moment then auto-find
+                        setTimeout(() => findNearbyPoliceStations(), 500);
+                    }
+                }
+            });
+        });
+
+        function navigateToPage(pageId) {
+            const targetLink = document.querySelector(`[data-page="${pageId}"]`);
+            if (targetLink) targetLink.click();
+        }
+
+        // Contacts Management
+        const CONTACTS_KEY = 'safeguard_contacts_v2';
+        const ROUTES_KEY = 'safeguard_routes_v2';
+        let contacts = [];
+
+        // Load contacts from backend
+        async function loadContacts() {
+            if (!currentUser || !currentUser.id) {
+                console.warn('No user logged in, using localStorage fallback');
+                contacts = JSON.parse(localStorage.getItem(CONTACTS_KEY) || '[]');
+                updateContactsList();
+                return;
+            }
+            
+            try {
+                const result = await apiRequest(`/contacts?user_id=${currentUser.id}`);
+                if (result.status === 'success') {
+                    contacts = result.contacts || [];
+                    // Also save to localStorage as backup
+                    localStorage.setItem(CONTACTS_KEY, JSON.stringify(contacts));
+                    updateContactsList();
+                }
+            } catch (error) {
+                console.error('Error loading contacts:', error);
+                // Fallback to localStorage
+                contacts = JSON.parse(localStorage.getItem(CONTACTS_KEY) || '[]');
+                updateContactsList();
+                alert('⚠️ Could not load contacts from server. Using local data.');
+            }
+        }
+
+        async function addContact() {
+            const name = document.getElementById('contactName').value;
+            const phone = document.getElementById('contactPhone').value;
+            const relation = document.getElementById('contactRelation').value;
+
+            if (!name || !phone) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            if (!currentUser || !currentUser.id) {
+                // Fallback to localStorage
+                const contact = {
+                    id: Date.now(),
+                    name,
+                    phone,
+                    relation
+                };
+                contacts.push(contact);
+                updateContactsList();
+                localStorage.setItem(CONTACTS_KEY, JSON.stringify(contacts));
+                document.getElementById('contactName').value = '';
+                document.getElementById('contactPhone').value = '';
+                document.getElementById('contactRelation').value = '';
+                return;
+            }
+
+            try {
+                const result = await apiRequest('/contacts', 'POST', {
+                    user_id: currentUser.id,
+                    name: name,
+                    phone: phone,
+                    relationship: relation
+                });
+                
+                if (result.status === 'success') {
+                    // Reload contacts from server
+                    await loadContacts();
+                    document.getElementById('contactName').value = '';
+                    document.getElementById('contactPhone').value = '';
+                    document.getElementById('contactRelation').value = '';
+                    alert('✅ Contact added successfully!');
+                }
+            } catch (error) {
+                console.error('Error adding contact:', error);
+                alert('❌ Error adding contact: ' + error.message);
+            }
+        }
+
+        async function deleteContact(id) {
+            if (!currentUser || !currentUser.id) {
+                // Fallback to localStorage
+                contacts = contacts.filter(c => c.id !== id);
+                updateContactsList();
+                localStorage.setItem(CONTACTS_KEY, JSON.stringify(contacts));
+                return;
+            }
+
+            try {
+                const result = await apiRequest(`/contacts/${id}`, 'DELETE');
+                if (result.status === 'success') {
+                    await loadContacts();
+                    alert('✅ Contact deleted successfully!');
+                }
+            } catch (error) {
+                console.error('Error deleting contact:', error);
+                // Fallback: remove from local array
+                contacts = contacts.filter(c => c.id !== id);
+                updateContactsList();
+                localStorage.setItem(CONTACTS_KEY, JSON.stringify(contacts));
+                alert('⚠️ Contact deleted locally. Server sync may have failed.');
+            }
+        }
+
+        function updateContactsList() {
+            const list = document.getElementById('contactsList');
+            const count = document.getElementById('contactCount');
+            
+            count.textContent = contacts.length;
+            
+            if (contacts.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #ffb3b3; padding: 2rem;">No emergency contacts added yet. Add your first contact above.</p>';
+                return;
+            }
+            
+            list.innerHTML = contacts.map(contact => `
+                <div class="contact-card">
+                    <button class="delete-btn" onclick="deleteContact(${contact.id})">×</button>
+                    <h4>👤 ${contact.name}</h4>
+                    <p>📞 ${contact.phone}</p>
+                    <p style="color: #ffb3b3; margin-top: 0.5rem;">${contact.relation}</p>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="dialNumber('${contact.phone.replace(/\s+/g, '')}')" style="flex: 1; min-width: 100px;">
+                            📞 Call
+                        </button>
+                        <button class="btn btn-primary" onclick="shareLocationToContact('${contact.phone.replace(/\s+/g, '')}', '${contact.name.replace(/'/g, "\\'")}')" style="flex: 1; min-width: 100px;">
+                            📍 Share Location
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Routes Management
+        let routes = [];
+
+        // Load routes from backend
+        async function loadRoutes() {
+            if (!currentUser || !currentUser.id) {
+                console.warn('No user logged in, using localStorage fallback');
+                routes = JSON.parse(localStorage.getItem(ROUTES_KEY) || '[]');
+                updateRoutesList();
+                return;
+            }
+            
+            try {
+                const result = await apiRequest(`/routes?user_id=${currentUser.id}`);
+                if (result.status === 'success') {
+                    routes = result.routes || [];
+                    // Also save to localStorage as backup
+                    localStorage.setItem(ROUTES_KEY, JSON.stringify(routes));
+                    updateRoutesList();
+                }
+            } catch (error) {
+                console.error('Error loading routes:', error);
+                // Fallback to localStorage
+                routes = JSON.parse(localStorage.getItem(ROUTES_KEY) || '[]');
+                updateRoutesList();
+                alert('⚠️ Could not load routes from server. Using local data.');
+            }
+        }
+
+        async function addRoute() {
+            const name = document.getElementById('routeName').value;
+            const address = document.getElementById('routeAddress').value;
+
+            if (!name || !address) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            if (!currentUser || !currentUser.id) {
+                // Fallback to localStorage
+                const route = {
+                    id: Date.now(),
+                    name,
+                    address
+                };
+                routes.push(route);
+                updateRoutesList();
+                localStorage.setItem(ROUTES_KEY, JSON.stringify(routes));
+                document.getElementById('routeName').value = '';
+                document.getElementById('routeAddress').value = '';
+                return;
+            }
+
+            try {
+                const result = await apiRequest('/routes', 'POST', {
+                    user_id: currentUser.id,
+                    name: name,
+                    address: address
+                });
+                
+                if (result.status === 'success') {
+                    // Reload routes from server
+                    await loadRoutes();
+                    document.getElementById('routeName').value = '';
+                    document.getElementById('routeAddress').value = '';
+                    alert('✅ Route added successfully!');
+                }
+            } catch (error) {
+                console.error('Error adding route:', error);
+                alert('❌ Error adding route: ' + error.message);
+            }
+        }
+
+        async function deleteRoute(id) {
+            if (!currentUser || !currentUser.id) {
+                // Fallback to localStorage
+                routes = routes.filter(r => r.id !== id);
+                updateRoutesList();
+                localStorage.setItem(ROUTES_KEY, JSON.stringify(routes));
+                return;
+            }
+
+            try {
+                const result = await apiRequest(`/routes/${id}`, 'DELETE');
+                if (result.status === 'success') {
+                    await loadRoutes();
+                    alert('✅ Route deleted successfully!');
+                }
+            } catch (error) {
+                console.error('Error deleting route:', error);
+                // Fallback: remove from local array
+                routes = routes.filter(r => r.id !== id);
+                updateRoutesList();
+                localStorage.setItem(ROUTES_KEY, JSON.stringify(routes));
+                alert('⚠️ Route deleted locally. Server sync may have failed.');
+            }
+        }
+
+        function updateRoutesList() {
+            const list = document.getElementById('routesList');
+            
+            if (routes.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #ffb3b3; padding: 2rem;">No safe routes saved yet. Add your frequently visited places above.</p>';
+                return;
+            }
+            
+            list.innerHTML = routes.map(route => `
+                <div class="route-card">
+                    <div style="flex: 1;">
+                        <h4 style="color: #dc143c; margin-bottom: 0.5rem;">📍 ${route.name}</h4>
+                        <p>${route.address}</p>
+                        <div style="display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="openRouteInMaps('${escapeHtml(route.address).replace(/'/g, "\\'")}', '${escapeHtml(route.name).replace(/'/g, "\\'")}')" style="flex: 1; min-width: 120px;">
+                                🗺️ Open in Maps
+                            </button>
+                            <button class="btn btn-primary" onclick="getDirectionsToRoute('${escapeHtml(route.address).replace(/'/g, "\\'")}', '${escapeHtml(route.name).replace(/'/g, "\\'")}')" style="flex: 1; min-width: 120px;">
+                                🧭 Get Directions
+                            </button>
+                        </div>
+                    </div>
+                    <button class="delete-btn" onclick="deleteRoute(${route.id})">×</button>
+                </div>
+            `).join('');
+        }
+
+        // SOS System
+        let sosTimer;
+        let sosActive = false;
+
+        document.getElementById('sosButton').addEventListener('mousedown', startSOS);
+        document.getElementById('sosButton').addEventListener('mouseup', cancelSOS);
+        document.getElementById('sosButton').addEventListener('touchstart', startSOS);
+        document.getElementById('sosButton').addEventListener('touchend', cancelSOS);
+
+        function startSOS() {
+            // Immediate short beep to confirm press
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const o = ctx.createOscillator();
+                const g = ctx.createGain();
+                o.type = 'square';
+                o.frequency.value = 880; // A5 short beep
+                o.connect(g); g.connect(ctx.destination);
+                g.gain.setValueAtTime(0.0001, ctx.currentTime);
+                g.gain.exponentialRampToValueAtTime(0.3, ctx.currentTime + 0.01);
+                g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.15);
+                o.start();
+                o.stop(ctx.currentTime + 0.18);
+            } catch (e) {}
+            sosTimer = setTimeout(() => {
+                triggerSOS();
+            }, 3000);
+            
+            document.getElementById('sosButton').style.animation = 'pulse 0.5s infinite';
+        }
+
+        function cancelSOS() {
+            clearTimeout(sosTimer);
+            document.getElementById('sosButton').style.animation = 'pulse 2s infinite';
+        }
+
+        function triggerSOS() {
+            if (sosActive) return;
+            
+            sosActive = true;
+            const alarm = document.getElementById('sosAlarm');
+            
+            // Play alarm sound
+            alarm.play().catch(e => console.log('Audio play failed:', e));
+            // Voice alert
+            try {
+                const msg = new SpeechSynthesisUtterance('Emergency! SOS activated. I need help.');
+                msg.rate = 1.0; msg.pitch = 1.0; msg.volume = 1.0;
+                window.speechSynthesis.cancel();
+                window.speechSynthesis.speak(msg);
+            } catch (e) {}
+            
+            // Get location and send alerts
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    sendSOSAlerts(lat, lng);
+                }, error => {
+                    console.error('Location error:', error);
+                    sendSOSAlerts(null, null);
+                });
+            } else {
+                sendSOSAlerts(null, null);
+            }
+            
+            // Show alert
+            alert('🚨 SOS ACTIVATED!\n\nEmergency alerts sent to all contacts.\nAlarm is now active.\n\nStay safe!');
+            
+            // Stop alarm after 30 seconds
+            setTimeout(() => {
+                alarm.pause();
+                alarm.currentTime = 0;
+                sosActive = false;
+            }, 30000);
+        }
+
+        function sendSOSAlerts(lat, lng) {
+            const locationText = lat && lng 
+                ? `https://maps.google.com/?q=${lat},${lng}` 
+                : 'Location unavailable';
+            
+            const message = `🚨 EMERGENCY SOS ALERT! 🚨\n\nI need immediate help!\n\nMy Location:\n${locationText}\n\n⚠️ This is an automated alert from SAFEGUARD 🛡\nPlease check on me immediately!`;
+            
+            if (contacts.length === 0) {
+                alert('⚠️ No emergency contacts saved!\nPlease add contacts in the Contacts page.');
+                return;
+            }
+            
+            console.log('SOS Alert sent to contacts:');
+            contacts.forEach(contact => {
+                console.log(`To: ${contact.phone}\nMessage: ${message}`);
+            });
+            
+            // Offer to send via WhatsApp or SMS
+            const contactList = contacts.map(c => `• ${c.name} (${c.phone})`).join('\n');
+            const alertMsg = `🚨 SOS Alert will be sent to:\n\n${contactList}\n\nSelect sending method:`;
+            
+            // Auto-send via WhatsApp for immediate alert
+            setTimeout(() => {
+                if (confirm(alertMsg + '\n\nOK = WhatsApp | Cancel = SMS')) {
+                    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+                    window.open(whatsappUrl, '_blank');
+                } else {
+                    window.location.href = `sms:?body=${encodeURIComponent(message)}`;
+                }
+            }, 1000);
+        }
+
+        // Location Sharing
+        function shareLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    const locationUrl = `https://maps.google.com/?q=${lat},${lng}`;
+                    
+                    alert(`📍 Location Sharing\n\nYour current location:\n${locationUrl}\n\nIn a real app, this would be shared with your emergency contacts.`);
+                    
+                    console.log('Location shared:', locationUrl);
+                }, error => {
+                    alert('Unable to get your location. Please enable location services.');
+                });
+            } else {
+                alert('Geolocation is not supported by your browser.');
+            }
+        }
+        
+        function shareLocationToContact(phone, name) {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    const locationUrl = `https://maps.google.com/?q=${lat},${lng}`;
+                    const message = `📍 My Current Location\n\n${locationUrl}\n\nShared via SAFEGUARD 🛡`;
+                    
+                    // Try WhatsApp first, fallback to SMS
+                    const whatsappUrl = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
+                    if (confirm(`Share location with ${name}?\n\nOK = WhatsApp\nCancel = SMS`)) {
+                        window.open(whatsappUrl, '_blank');
+                    } else {
+                        window.location.href = `sms:${phone}?body=${encodeURIComponent(message)}`;
+                    }
+                }, error => {
+                    alert('Unable to get your location. Please enable location services.');
+                });
+            } else {
+                alert('Geolocation is not supported by your browser.');
+            }
+        }
+
+        // Camera Page: preview, capture, save, video recording
+        let camStream = null;
+        let mediaRecorder = null;
+        let recordedChunks = [];
+        let isRecording = false;
+        let currentCameraMode = 'rear'; // 'rear' or 'front'
+        const PHOTO_KEY = 'safeguard_photos_v1';
+        const VIDEO_KEY = 'safeguard_videos_v1';
+        
+        function startCamera(cameraMode = 'rear') {
+            const video = document.getElementById('camVideo');
+            if (!video) return;
+            
+            // Stop existing stream if switching cameras
+            if (camStream) {
+                camStream.getTracks().forEach(t => t.stop());
+                camStream = null;
+            }
+            
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert('Camera access is not supported by your browser.');
+                return;
+            }
+            
+            // Determine camera constraints based on mode
+            const constraints = {
+                video: {
+                    facingMode: cameraMode === 'rear' ? 'environment' : 'user',
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                },
+                audio: true
+            };
+            
+            navigator.mediaDevices.getUserMedia(constraints)
+                .then(stream => {
+                    camStream = stream;
+                    video.srcObject = stream;
+                    currentCameraMode = cameraMode;
+                    updateCameraStatus();
+                })
+                .catch(error => {
+                    console.error('Camera error:', error);
+                    alert('Unable to access camera. Please grant camera permissions.\n\nError: ' + error.message);
+                });
+        }
+        
+        function switchCamera() {
+            if (!camStream) {
+                // If camera is not open, start with opposite of current mode
+                const newMode = currentCameraMode === 'rear' ? 'front' : 'rear';
+                startCamera(newMode);
+                return;
+            }
+            
+            // Stop video recording if active
+            if (isRecording) {
+                if (!confirm('Recording is in progress. Stop recording and switch camera?')) {
+                    return;
+                }
+                stopVideoRecording();
+            }
+            
+            // Switch to opposite camera
+            const newMode = currentCameraMode === 'rear' ? 'front' : 'rear';
+            startCamera(newMode);
+        }
+        
+        function updateCameraStatus() {
+            const statusEl = document.getElementById('cameraStatus');
+            if (statusEl) {
+                statusEl.textContent = `📷 Camera: ${currentCameraMode === 'rear' ? 'Rear' : 'Front'}`;
+            }
+        }
+        
+        function stopCamera() {
+            // Stop video recording if active
+            if (isRecording) {
+                stopVideoRecording();
+            }
+            if (camStream) {
+                camStream.getTracks().forEach(t => t.stop());
+                camStream = null;
+            }
+            const video = document.getElementById('camVideo');
+            if (video) video.srcObject = null;
+            currentCameraMode = 'rear'; // Reset to rear camera
+            updateCameraStatus();
+        }
+        
+        function capturePhoto() {
+            const video = document.getElementById('camVideo');
+            const canvas = document.getElementById('camCanvas');
+            if (!video || !canvas) return;
+            if (!camStream) {
+                alert('Please open camera first!');
+                return;
+            }
+            const w = video.videoWidth || 640;
+            const h = video.videoHeight || 480;
+            canvas.width = w; canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, w, h);
+            const dataUrl = canvas.toDataURL('image/png');
+            const photos = JSON.parse(localStorage.getItem(PHOTO_KEY) || '[]');
+            photos.unshift({ id: Date.now(), dataUrl });
+            localStorage.setItem(PHOTO_KEY, JSON.stringify(photos));
+            renderGallery();
+            
+            // Flash effect
+            const flash = document.createElement('div');
+            flash.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:white; opacity:0.8; z-index:9999; pointer-events:none;';
+            document.body.appendChild(flash);
+            setTimeout(() => flash.remove(), 150);
+        }
+        
+        function startVideoRecording() {
+            const video = document.getElementById('camVideo');
+            if (!video || !camStream) {
+                alert('Please open camera first!');
+                return;
+            }
+            
+            if (isRecording) {
+                alert('Recording is already in progress!');
+                return;
+            }
+            
+            recordedChunks = [];
+            
+            try {
+                const options = { mimeType: 'video/webm;codecs=vp9,opus' };
+                if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+                    options.mimeType = 'video/webm;codecs=vp8,opus';
+                    if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+                        options.mimeType = 'video/webm';
+                    }
+                }
+                
+                mediaRecorder = new MediaRecorder(camStream, options);
+                
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data && event.data.size > 0) {
+                        recordedChunks.push(event.data);
+                    }
+                };
+                
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                    const videoUrl = URL.createObjectURL(blob);
+                    const videos = JSON.parse(localStorage.getItem(VIDEO_KEY) || '[]');
+                    videos.unshift({ id: Date.now(), url: videoUrl, blob: null });
+                    localStorage.setItem(VIDEO_KEY, JSON.stringify(videos));
+                    renderVideoGallery();
+                };
+                
+                mediaRecorder.start();
+                isRecording = true;
+                
+                // Update UI
+                document.getElementById('recordingIndicator').style.display = 'block';
+                document.getElementById('recordVideoBtn').style.display = 'none';
+                document.getElementById('stopRecordBtn').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error starting video recording:', error);
+                alert('Error starting video recording: ' + error.message);
+            }
+        }
+        
+        function stopVideoRecording() {
+            if (!isRecording || !mediaRecorder) {
+                return;
+            }
+            
+            try {
+                mediaRecorder.stop();
+                isRecording = false;
+                
+                // Update UI
+                document.getElementById('recordingIndicator').style.display = 'none';
+                document.getElementById('recordVideoBtn').style.display = 'block';
+                document.getElementById('stopRecordBtn').style.display = 'none';
+                
+                alert('✅ Video recorded successfully!');
+            } catch (error) {
+                console.error('Error stopping video recording:', error);
+                alert('Error stopping video recording: ' + error.message);
+            }
+        }
+        
+        function renderGallery() {
+            const wrap = document.getElementById('photoGallery');
+            if (!wrap) return;
+            const photos = JSON.parse(localStorage.getItem(PHOTO_KEY) || '[]');
+            if (!photos.length) { wrap.innerHTML = '<p style="color:#ffb3b3">No photos saved.</p>'; return; }
+            wrap.innerHTML = photos.map(p => `
+                <div style="position:relative; border:1px solid rgba(220,20,60,0.3); border-radius:8px; overflow:hidden; background:#000;">
+                    <img src="${p.dataUrl}" alt="Captured" style="width:100%; display:block;">
+                    <button onclick="deletePhoto(${p.id})" class="delete-btn" style="position:absolute; top:6px; right:6px;">×</button>
+                    <a download="safeguard-${p.id}.png" href="${p.dataUrl}" class="btn btn-primary" style="display:block; text-align:center; margin:8px; padding:0.5rem;">Download</a>
+                </div>
+            `).join('');
+        }
+        
+        function renderVideoGallery() {
+            const wrap = document.getElementById('videoGallery');
+            if (!wrap) return;
+            const videos = JSON.parse(localStorage.getItem(VIDEO_KEY) || '[]');
+            if (!videos.length) { wrap.innerHTML = '<p style="color:#ffb3b3">No videos saved.</p>'; return; }
+            wrap.innerHTML = videos.map(v => `
+                <div style="position:relative; border:1px solid rgba(220,20,60,0.3); border-radius:8px; overflow:hidden; background:#000;">
+                    <video src="${v.url}" controls style="width:100%; display:block; max-height:200px;"></video>
+                    <button onclick="deleteVideo(${v.id})" class="delete-btn" style="position:absolute; top:6px; right:6px;">×</button>
+                    <a download="safeguard-video-${v.id}.webm" href="${v.url}" class="btn btn-primary" style="display:block; text-align:center; margin:8px; padding:0.5rem;">Download</a>
+                </div>
+            `).join('');
+        }
+        
+        function deletePhoto(id) {
+            const photos = JSON.parse(localStorage.getItem(PHOTO_KEY) || '[]').filter(p => p.id !== id);
+            localStorage.setItem(PHOTO_KEY, JSON.stringify(photos));
+            renderGallery();
+        }
+        
+        function deleteVideo(id) {
+            const videos = JSON.parse(localStorage.getItem(VIDEO_KEY) || '[]');
+            const video = videos.find(v => v.id === id);
+            if (video && video.url) {
+                URL.revokeObjectURL(video.url);
+            }
+            const updatedVideos = videos.filter(v => v.id !== id);
+            localStorage.setItem(VIDEO_KEY, JSON.stringify(updatedVideos));
+            renderVideoGallery();
+        }
+        
+        function clearAllMedia() {
+            if (confirm('Delete all saved photos and videos?')) {
+                // Revoke all video URLs
+                const videos = JSON.parse(localStorage.getItem(VIDEO_KEY) || '[]');
+                videos.forEach(v => {
+                    if (v.url) URL.revokeObjectURL(v.url);
+                });
+                
+                localStorage.setItem(PHOTO_KEY, '[]');
+                localStorage.setItem(VIDEO_KEY, '[]');
+                renderGallery();
+                renderVideoGallery();
+            }
+        }
+        
+        function clearAllPhotos() {
+            if (confirm('Delete all saved photos?')) {
+                localStorage.setItem(PHOTO_KEY, '[]');
+                renderGallery();
+            }
+        }
+
+        // Police Directions
+        function getDirections(stationName) {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    alert(`🗺️ Getting directions to ${stationName}...\n\nIn a real app, this would open Google Maps with directions from your current location.`);
+                }, error => {
+                    alert('Unable to get your location for directions.');
+                });
+            } else {
+                alert('Geolocation is not supported by your browser.');
+            }
+        }
+
+        function openMapsNearMe(query) {
+            window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`, '_blank');
+        }
+
+        function dialNumber(num) {
+            window.location.href = `tel:${num}`;
+        }
+
+        // Live Location Map
+        function initLiveMap() {
+            if (liveMap) return;
+            liveMap = L.map('liveMap');
+            const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap'
+            });
+            tiles.addTo(liveMap);
+            livePath = L.polyline([], { color: '#dc143c', weight: 4, opacity: 0.7 }).addTo(liveMap);
+        }
+
+        function startLiveWatch() {
+            if (!navigator.geolocation) { alert('Geolocation is not supported.'); return; }
+            if (liveWatchId) return;
+            liveWatchId = navigator.geolocation.watchPosition(onLivePos, onLiveErr, { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 });
+        }
+
+        function stopLiveWatch() {
+            if (liveWatchId) {
+                navigator.geolocation.clearWatch(liveWatchId);
+                liveWatchId = null;
+            }
+        }
+
+        function onLivePos(pos) {
+            const { latitude, longitude, accuracy, speed } = pos.coords;
+            const latEl = document.getElementById('liveLat');
+            const lngEl = document.getElementById('liveLng');
+            const accEl = document.getElementById('liveAcc');
+            const spdEl = document.getElementById('liveSpeed');
+            if (latEl) latEl.textContent = latitude.toFixed(6);
+            if (lngEl) lngEl.textContent = longitude.toFixed(6);
+            if (accEl) accEl.textContent = `${Math.round(accuracy)} m`;
+            if (spdEl) spdEl.textContent = speed ? `${(speed * 3.6).toFixed(1)} km/h` : '–';
+
+            if (!liveMap) return;
+            const latlng = [latitude, longitude];
+            if (!liveMarker) {
+                liveMarker = L.marker(latlng).addTo(liveMap);
+                liveAccuracy = L.circle(latlng, { radius: accuracy, color: '#dc143c', fillColor: '#dc143c', fillOpacity: 0.1 }).addTo(liveMap);
+                liveMap.setView(latlng, 16);
+            } else {
+                liveMarker.setLatLng(latlng);
+                liveAccuracy.setLatLng(latlng).setRadius(accuracy);
+            }
+            livePositions.push(latlng);
+            if (livePositions.length > 1) {
+                livePath.setLatLngs(livePositions);
+            } else {
+                livePath.setLatLngs([latlng]);
+            }
+        }
+
+        function onLiveErr(err) {
+            console.error('Live location error:', err);
+        }
+
+        function openLiveInMaps() {
+            const lat = (document.getElementById('liveLat')||{}).textContent;
+            const lng = (document.getElementById('liveLng')||{}).textContent;
+            if (!lat || !lng || lat === '–' || lng === '–') { alert('Location not available yet.'); return; }
+            window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
+        }
+
+        function copyLiveLink() {
+            const lat = (document.getElementById('liveLat')||{}).textContent;
+            const lng = (document.getElementById('liveLng')||{}).textContent;
+            if (!lat || !lng || lat === '–' || lng === '–') { alert('Location not available yet.'); return; }
+            const url = `https://www.google.com/maps?q=${lat},${lng}`;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(() => alert('Maps link copied to clipboard')).catch(() => alert(url));
+            } else {
+                alert(url);
+            }
+        }
+
+        // Real-Time Location Sharing Functions
+        let trackingInterval = null;
+        let trackingCount = 0;
+        
+        function getCurrentLocationData() {
+            const lat = (document.getElementById('liveLat')||{}).textContent;
+            const lng = (document.getElementById('liveLng')||{}).textContent;
+            if (!lat || !lng || lat === '–' || lng === '–') {
+                return null;
+            }
+            const url = `https://www.google.com/maps?q=${lat},${lng}`;
+            const timestamp = new Date().toLocaleString();
+            const message = `📍 Real-Time Location Update #${trackingCount + 1}\n\nTime: ${timestamp}\n\nCurrent Location:\n${url}\n\nTracking via SAFEGUARD 🛡`;
+            return { lat, lng, url, message };
+        }
+
+        function shareViaWhatsApp() {
+            const data = getCurrentLocationData();
+            if (!data) {
+                alert('⚠️ Location not available yet.\nPlease wait for GPS to acquire your location.');
+                return;
+            }
+            
+            // WhatsApp Web API
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(data.message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        function shareViaSMS() {
+            const data = getCurrentLocationData();
+            if (!data) {
+                alert('⚠️ Location not available yet.\nPlease wait for GPS to acquire your location.');
+                return;
+            }
+            
+            // SMS protocol - works on mobile devices
+            window.location.href = `sms:?body=${encodeURIComponent(data.message)}`;
+        }
+
+        function shareViaEmail() {
+            const data = getCurrentLocationData();
+            if (!data) {
+                alert('⚠️ Location not available yet.\nPlease wait for GPS to acquire your location.');
+                return;
+            }
+            
+            // Email protocol
+            const subject = 'My Real-Time Location - SAFEGUARD';
+            const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(data.message)}`;
+            window.location.href = mailtoUrl;
+        }
+
+        function shareToAllContacts() {
+            const data = getCurrentLocationData();
+            if (!data) {
+                alert('⚠️ Location not available yet.\nPlease wait for GPS to acquire your location.');
+                return;
+            }
+            
+            if (contacts.length === 0) {
+                alert('⚠️ No emergency contacts saved!\nPlease add contacts in the Contacts page first.');
+                return;
+            }
+            
+            // Show sharing options
+            const shareMsg = `📍 Your location will be shared with ${contacts.length} contact(s):\n\n` +
+                contacts.map(c => `• ${c.name} (${c.phone})`).join('\n') +
+                `\n\nLocation: ${data.url}\n\nChoose sharing method:`;
+            
+            if (confirm(shareMsg + '\n\nOK = WhatsApp | Cancel = SMS')) {
+                shareViaWhatsApp();
+            } else {
+                shareViaSMS();
+            }
+        }
+
+        // Police Station Finder using Overpass API (OpenStreetMap)
+        let userLocationForPolice = null;
+        
+        function findNearbyPoliceStations() {
+            const statusEl = document.getElementById('policeStatus');
+            const stationsEl = document.getElementById('policeStations');
+            
+            if (!navigator.geolocation) {
+                alert('⚠️ Geolocation is not supported by your browser.');
+                return;
+            }
+            
+            // Show loading state
+            if (statusEl) statusEl.innerHTML = '<span class="status-indicator"></span>🔍 Getting your location...';
+            if (stationsEl) stationsEl.innerHTML = '<p style="text-align: center; color: #ffb3b3; padding: 2rem;">Loading...</p>';
+            
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    userLocationForPolice = { lat, lng };
+                    
+                    if (statusEl) statusEl.innerHTML = '<span class="status-indicator"></span>📡 Searching for nearby police stations...';
+                    
+                    fetchPoliceStations(lat, lng);
+                },
+                error => {
+                    console.error('Geolocation error:', error);
+                    if (statusEl) statusEl.innerHTML = '⚠️ Unable to get your location. Please enable location services.';
+                    if (stationsEl) stationsEl.innerHTML = '<p style="text-align: center; color: #ffb3b3; padding: 2rem;">Location access denied or unavailable.</p>';
+                }
+            );
+        }
+        
+        function fetchPoliceStations(lat, lng) {
+            const statusEl = document.getElementById('policeStatus');
+            const stationsEl = document.getElementById('policeStations');
+            
+            // Overpass API query for police stations within 5km radius
+            const radius = 5000; // 5km in meters
+            const query = `
+                [out:json][timeout:25];
+                (
+                  node["amenity"="police"](around:${radius},${lat},${lng});
+                  way["amenity"="police"](around:${radius},${lat},${lng});
+                  relation["amenity"="police"](around:${radius},${lat},${lng});
+                );
+                out center;
+            `;
+            
+            const overpassUrl = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
+            
+            fetch(overpassUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (statusEl) statusEl.innerHTML = `<span class="status-indicator"></span>✅ Found ${data.elements.length} police station(s) nearby`;
+                    
+                    if (data.elements.length === 0) {
+                        if (stationsEl) stationsEl.innerHTML = `
+                            <p style="text-align: center; color: #ffb3b3; padding: 2rem;">
+                                No police stations found within 5km radius.<br>
+                                Try using the "Open in Maps" button above to search in Google Maps.
+                            </p>
+                        `;
+                        return;
+                    }
+                    
+                    // Process and sort stations by distance
+                    const stations = data.elements.map(element => {
+                        const stationLat = element.lat || (element.center ? element.center.lat : null);
+                        const stationLng = element.lon || (element.center ? element.center.lon : null);
+                        
+                        if (!stationLat || !stationLng) return null;
+                        
+                        const distance = calculateDistance(lat, lng, stationLat, stationLng);
+                        
+                        return {
+                            name: element.tags.name || 'Police Station',
+                            address: formatAddress(element.tags),
+                            phone: element.tags.phone || element.tags['contact:phone'] || '100 / 112',
+                            lat: stationLat,
+                            lng: stationLng,
+                            distance: distance
+                        };
+                    }).filter(s => s !== null).sort((a, b) => a.distance - b.distance);
+                    
+                    // Display stations
+                    if (stationsEl) {
+                        stationsEl.innerHTML = stations.slice(0, 10).map(station => `
+                            <div class="station-card">
+                                <h4>🚔 ${escapeHtml(station.name)}</h4>
+                                <p class="distance">📏 ${station.distance.toFixed(2)} km away</p>
+                                ${station.address ? `<p>📍 ${escapeHtml(station.address)}</p>` : ''}
+                                <p>📞 ${escapeHtml(station.phone)}</p>
+                                <div style="display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap;">
+                                    <button class="btn btn-primary" onclick="getDirectionsToCoords(${station.lat}, ${station.lng}, '${escapeHtml(station.name).replace(/'/g, "\\'")}')">
+                                        🗺️ Get Directions
+                                    </button>
+                                    <button class="btn btn-primary" onclick="dialNumber('${escapeHtml(station.phone)}')">
+                                        📞 Call
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching police stations:', error);
+                    if (statusEl) statusEl.innerHTML = '⚠️ Error searching for police stations. Please try again.';
+                    if (stationsEl) stationsEl.innerHTML = `
+                        <p style="text-align: center; color: #ffb3b3; padding: 2rem;">
+                            Unable to fetch police stations. Please check your internet connection and try again.<br>
+                            You can also use the "Open in Maps" button above.
+                        </p>
+                    `;
+                });
+        }
+        
+        function calculateDistance(lat1, lng1, lat2, lng2) {
+            // Haversine formula for calculating distance between two coordinates
+            const R = 6371; // Earth's radius in km
+            const dLat = toRadians(lat2 - lat1);
+            const dLng = toRadians(lng2 - lng1);
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                     Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+                     Math.sin(dLng/2) * Math.sin(dLng/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+        
+        function toRadians(degrees) {
+            return degrees * Math.PI / 180;
+        }
+        
+        function formatAddress(tags) {
+            const parts = [];
+            if (tags['addr:street']) parts.push(tags['addr:street']);
+            if (tags['addr:city']) parts.push(tags['addr:city']);
+            if (tags['addr:state']) parts.push(tags['addr:state']);
+            if (tags['addr:postcode']) parts.push(tags['addr:postcode']);
+            return parts.length > 0 ? parts.join(', ') : '';
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function getDirectionsToCoords(lat, lng, name) {
+            if (userLocationForPolice) {
+                const url = `https://www.google.com/maps/dir/?api=1&origin=${userLocationForPolice.lat},${userLocationForPolice.lng}&destination=${lat},${lng}&travelmode=driving`;
+                window.open(url, '_blank');
+            } else {
+                // Fallback: just open the destination
+                const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+                window.open(url, '_blank');
+            }
+        }
+        
+        // Route functions for Google Maps
+        function openRouteInMaps(address, routeName) {
+            if (!address) {
+                alert('Address not available for this route.');
+                return;
+            }
+            const query = routeName ? `${routeName}, ${address}` : address;
+            const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+            window.open(url, '_blank');
+        }
+        
+        function getDirectionsToRoute(address, routeName) {
+            if (!address) {
+                alert('Address not available for this route.');
+                return;
+            }
+            
+            // Get user's current location for directions
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        const userLat = position.coords.latitude;
+                        const userLng = position.coords.longitude;
+                        const query = routeName ? `${routeName}, ${address}` : address;
+                        const url = `https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLng}&destination=${encodeURIComponent(query)}&travelmode=driving`;
+                        window.open(url, '_blank');
+                    },
+                    error => {
+                        console.error('Location error:', error);
+                        // Fallback: just open the destination
+                        const query = routeName ? `${routeName}, ${address}` : address;
+                        const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+                        window.open(url, '_blank');
+                        alert('⚠️ Could not get your location. Opening destination in Maps instead.');
+                    }
+                );
+            } else {
+                // Fallback: just open the destination
+                const query = routeName ? `${routeName}, ${address}` : address;
+                const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+                window.open(url, '_blank');
+            }
+        }
+
+        // Continuous Tracking Functions
+        function startContinuousTracking() {
+            if (trackingInterval) {
+                alert('⚠️ Tracking is already active!');
+                return;
+            }
+            
+            if (contacts.length === 0) {
+                alert('⚠️ No emergency contacts saved!\nPlease add contacts in the Contacts page first.');
+                return;
+            }
+            
+            const data = getCurrentLocationData();
+            if (!data) {
+                alert('⚠️ Location not available yet.\nPlease wait for GPS to acquire your location.');
+                return;
+            }
+            
+            if (!confirm('Start continuous location tracking?\n\nYour location will be shared via WhatsApp every 2 minutes.\n\nThis will open a new WhatsApp tab every 2 minutes. Make sure to keep this page open.')) {
+                return;
+            }
+            
+            trackingCount = 0;
+            
+            // Show active tracking UI
+            const startBtn = document.getElementById('startTrackBtn');
+            const stopBtn = document.getElementById('stopTrackBtn');
+            const statusEl = document.getElementById('trackingStatus');
+            
+            if (startBtn) startBtn.style.display = 'none';
+            if (stopBtn) stopBtn.style.display = 'block';
+            
+            // Send first update immediately
+            shareViaWhatsApp();
+            trackingCount++;
+            
+            // Update status
+            if (statusEl) {
+                statusEl.innerHTML = '<span class="status-indicator"></span>🔄 Continuous tracking active - Sharing location every 2 minutes';
+            }
+            
+            // Set interval for continuous updates (every 2 minutes)
+            trackingInterval = setInterval(() => {
+                trackingCount++;
+                const currentData = getCurrentLocationData();
+                if (currentData) {
+                    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(currentData.message)}`;
+                    window.open(whatsappUrl, '_blank');
+                    
+                    if (statusEl) {
+                        statusEl.innerHTML = `<span class="status-indicator"></span>🔄 Tracking active - Update #${trackingCount} sent at ${new Date().toLocaleTimeString()}`;
+                    }
+                }
+            }, 120000); // 120000ms = 2 minutes
+            
+            alert('✅ Continuous tracking started!\n\nLocation updates will be sent every 2 minutes via WhatsApp.\n\nKeep this page open for tracking to continue.');
+        }
+        
+        function stopContinuousTracking() {
+            if (!trackingInterval) {
+                alert('⚠️ Tracking is not active!');
+                return;
+            }
+            
+            if (confirm('Stop continuous location tracking?')) {
+                clearInterval(trackingInterval);
+                trackingInterval = null;
+                trackingCount = 0;
+                
+                // Reset UI
+                const startBtn = document.getElementById('startTrackBtn');
+                const stopBtn = document.getElementById('stopTrackBtn');
+                const statusEl = document.getElementById('trackingStatus');
+                
+                if (startBtn) startBtn.style.display = 'block';
+                if (stopBtn) stopBtn.style.display = 'none';
+                
+                if (statusEl) {
+                    statusEl.innerHTML = 'Share your current location instantly with your contacts';
+                }
+                
+                alert('✅ Continuous tracking stopped.');
+            }
+        }
+        
+        // Logout
+        function logoutSafeguard() {
+            // Stop tracking if active
+            if (trackingInterval) {
+                clearInterval(trackingInterval);
+                trackingInterval = null;
+            }
+            
+            try { localStorage.removeItem('safeguard_logged_in'); } catch (e) {}
+            window.location.replace('pg1.html');
+        }
+
+        // Initialize - Load data from backend
+        (async function() {
+            await loadContacts();
+            await loadRoutes();
+            renderVideoGallery(); // Initialize video gallery
+        })();
+
+        // Add some demo data
+        setTimeout(() => {
+            // You can uncomment these to add demo contacts
+            // contacts.push({ id: 1, name: 'Mom', phone: '+91-9876543210', relation: 'Mother' });
+            // contacts.push({ id: 2, name: 'Best Friend', phone: '+91-9876543211', relation: 'Friend' });
+            // updateContactsList();
+        }, 100);
+    </script>
+</body>
+</html>

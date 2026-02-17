@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="manifest" href="manifest.json">
+
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("service-worker.js");
+}
+</script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safeguard - Women Safety Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d0000 50%, #1a1a1a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(220, 20, 60, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(139, 0, 0, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #dc143c, #ff1744);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 8px 35px rgba(220, 20, 60, 0.5), 0 0 20px rgba(255, 23, 68, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .main-title {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(220, 20, 60, 0.6), 2px 2px 4px rgba(0,0,0,0.5);
+            background: linear-gradient(135deg, #ff1744, #dc143c, #ff1744);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease infinite;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+            font-weight: 300;
+            color: #ffcccc;
+            letter-spacing: 1px;
+        }
+
+        .form-container {
+            background: rgba(30, 30, 30, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255, 23, 68, 0.2);
+            animation: slideUp 0.8s ease-out;
+            max-width: 450px;
+            margin: 0 auto;
+            border: 1px solid rgba(220, 20, 60, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-title {
+            color: #ff1744;
+            font-size: 2em;
+            margin-bottom: 10px;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(255, 23, 68, 0.5);
+        }
+
+        .form-subtitle {
+            color: #ccc;
+            font-size: 0.95em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            animation: fadeIn 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+        .form-group:nth-child(3) { animation-delay: 0.3s; }
+        .form-group:nth-child(4) { animation-delay: 0.4s; }
+        .form-group:nth-child(5) { animation-delay: 0.5s; }
+        .form-group:nth-child(6) { animation-delay: 0.6s; }
+        .form-group:nth-child(7) { animation-delay: 0.7s; }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ff9999;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid rgba(220, 20, 60, 0.3);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: rgba(40, 40, 40, 0.8);
+            color: white;
+        }
+
+        .form-group input::placeholder,
+        .form-group select::placeholder {
+            color: #999;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #ff1744;
+            box-shadow: 0 0 15px rgba(255, 23, 68, 0.4), inset 0 0 10px rgba(255, 23, 68, 0.1);
+            background: rgba(50, 30, 30, 0.8);
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #ff1744;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .password-toggle:hover {
+            transform: translateY(-50%) scale(1.2);
+        }
+
+        .password-strength {
+            margin-top: 8px;
+            font-size: 0.85em;
+            color: #ccc;
+        }
+
+        .strength-bar {
+            height: 4px;
+            background: rgba(220, 20, 60, 0.2);
+            border-radius: 2px;
+            margin-top: 4px;
+            overflow: hidden;
+        }
+
+        .strength-fill {
+            height: 100%;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .strength-weak .strength-fill {
+            width: 33%;
+            background: linear-gradient(90deg, #dc143c, #ff1744);
+        }
+
+        .strength-medium .strength-fill {
+            width: 66%;
+            background: linear-gradient(90deg, #ff8c00, #ffa500);
+        }
+
+        .strength-strong .strength-fill {
+            width: 100%;
+            background: linear-gradient(90deg, #28a745, #20c997);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #dc143c, #ff1744);
+            color: white;
+            box-shadow: 0 8px 20px rgba(220, 20, 60, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(255, 23, 68, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #ff1744;
+            border: 2px solid #ff1744;
+            margin-top: 10px;
+            box-shadow: 0 0 15px rgba(255, 23, 68, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 23, 68, 0.1);
+            box-shadow: 0 0 25px rgba(255, 23, 68, 0.4);
+        }
+
+        .form-links {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .form-links a {
+            color: #ff9999;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .form-links a:hover {
+            color: #ff1744;
+            text-shadow: 0 0 10px rgba(255, 23, 68, 0.5);
+        }
+
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            color: #666;
+            position: relative;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 45%;
+            height: 1px;
+            background: rgba(220, 20, 60, 0.3);
+        }
+
+        .divider::before {
+            left: 0;
+        }
+
+        .divider::after {
+            right: 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            animation: slideDown 0.4s ease-out;
+        }
+
+        .alert-success {
+            background: rgba(40, 167, 69, 0.2);
+            color: #4ade80;
+            border: 1px solid rgba(40, 167, 69, 0.4);
+        }
+
+        .alert-error {
+            background: rgba(220, 20, 60, 0.2);
+            color: #ff7777;
+            border: 1px solid rgba(220, 20, 60, 0.4);
+        }
+
+        .success-page {
+            background: rgba(30, 30, 30, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255, 23, 68, 0.2);
+            animation: slideUp 0.8s ease-out;
+            max-width: 450px;
+            margin: 0 auto;
+            text-align: center;
+            border: 1px solid rgba(220, 20, 60, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            color: white;
+            box-shadow: 0 0 30px rgba(40, 167, 69, 0.5);
+            animation: scaleIn 0.6s ease-out;
+        }
+
+        .success-title {
+            color: #ff1744;
+            font-size: 2em;
+            margin-bottom: 15px;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(255, 23, 68, 0.5);
+        }
+
+        .success-message {
+            color: #ccc;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 8px 35px rgba(220, 20, 60, 0.5), 0 0 20px rgba(255, 23, 68, 0.3);
+            }
+            50% {
+                box-shadow: 0 8px 35px rgba(220, 20, 60, 0.8), 0 0 30px rgba(255, 23, 68, 0.6);
+            }
+        }
+
+        @keyframes gradientShift {
+            0%, 100% {
+                background-position: 0% center;
+            }
+            50% {
+                background-position: 100% center;
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .form-container,
+            .success-page {
+                padding: 30px 20px;
+            }
+            
+            .main-title {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🛡️</div>
+            <h1 class="main-title">SAFEGUARD</h1>
+            <p class="subtitle">Women Safety Portal</p>
+        </div>
+
+        <!-- Login Form -->
+        <div id="loginForm" class="form-container">
+            <div class="form-header">
+                <h2 class="form-title">Welcome Back</h2>
+                <p class="form-subtitle">Sign in to access your account</p>
+            </div>
+
+            <div id="loginAlert" class="alert hidden"></div>
+
+            <form id="loginFormElement">
+                <div class="form-group">
+                    <label for="loginUsername">Username</label>
+                    <input type="text" id="loginUsername" name="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <div class="password-container">
+                        <input type="password" id="loginPassword" name="password" required>
+                        <span class="password-toggle" onclick="togglePassword('loginPassword')">👁️</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Sign In</button>
+            </form>
+
+            <div class="form-links">
+                <a href="#" onclick="showForgotPassword()">Forgot Password?</a>
+            </div>
+
+            <div class="divider">or</div>
+
+            <button type="button" class="btn btn-secondary" onclick="showRegister()">Create New Account</button>
+        </div>
+
+        <!-- Registration Form -->
+        <div id="registerForm" class="form-container hidden">
+            <div class="form-header">
+                <h2 class="form-title">Join Us</h2>
+                <p class="form-subtitle">Create your account to get started</p>
+            </div>
+
+            <div id="registerAlert" class="alert hidden"></div>
+
+            <form id="registerFormElement">
+                <div class="form-group">
+                    <label for="registerUsername">Username</label>
+                    <input type="text" id="registerUsername" name="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="registerName">Full Name</label>
+                    <input type="text" id="registerName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email Address</label>
+                    <input type="email" id="registerEmail" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="registerSecurityQuestion">Security Question</label>
+                    <select id="registerSecurityQuestion" name="securityQuestion" required>
+                        <option value="">Select a security question</option>
+                        <option value="first_pet">What was the name of your first pet?</option>
+                        <option value="birth_city">In which city were you born?</option>
+                        <option value="mother_maiden">What is your mother's maiden name?</option>
+                        <option value="first_car">What was your first car model?</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="registerSecurityAnswer">Security Answer</label>
+                    <input type="text" id="registerSecurityAnswer" name="securityAnswer" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="registerPassword">Password</label>
+                    <div class="password-container">
+                        <input type="password" id="registerPassword" name="password" required>
+                        <span class="password-toggle" onclick="togglePassword('registerPassword')">👁️</span>
+                    </div>
+                    <div class="password-strength">
+                        <div class="strength-bar">
+                            <div class="strength-fill"></div>
+                        </div>
+                        <span class="strength-text">Password strength: <span id="strengthText">Weak</span></span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Create Account</button>
+            </form>
+
+            <div class="form-links">
+                <a href="#" onclick="showLogin()">Already have an account? Sign in</a>
+            </div>
+        </div>
+
+        <!-- Forgot Password Form -->
+        <div id="forgotPasswordForm" class="form-container hidden">
+            <div class="form-header">
+                <h2 class="form-title">Reset Password</h2>
+                <p class="form-subtitle">Answer your security question to reset your password</p>
+            </div>
+
+            <div id="forgotAlert" class="alert hidden"></div>
+
+            <form id="forgotPasswordFormElement">
+                <div class="form-group">
+                    <label for="forgotEmail">Email Address</label>
+                    <input type="email" id="forgotEmail" name="email" required>
+                </div>
+
+                <button type="button" class="btn btn-secondary" onclick="verifyUser()">Verify Identity</button>
+
+                <div id="securityQuestionSection" class="hidden">
+                    <div class="form-group">
+                        <label id="securityQuestionLabel">Security Question</label>
+                        <p id="securityQuestionText"></p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="securityAnswerInput">Your Answer</label>
+                        <input type="text" id="securityAnswerInput" name="securityAnswer" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="newPassword">New Password</label>
+                        <div class="password-container">
+                            <input type="password" id="newPassword" name="newPassword" required>
+                            <span class="password-toggle" onclick="togglePassword('newPassword')">👁️</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Reset Password</button>
+                </div>
+            </form>
+
+            <div class="form-links">
+                <a href="#" onclick="showLogin()">Back to Login</a>
+            </div>
+        </div>
+
+        <!-- Success Page -->
+        <div id="successPage" class="success-page hidden">
+            <div class="success-icon">✓</div>
+            <h2 class="success-title">Login Successful!</h2>
+            <p class="success-message">You have been successfully logged in to your account.</p>
+            <button type="button" class="btn btn-primary" onclick="showLogin()">Continue</button>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration
+        const API_BASE_URL = 'http://127.0.0.1:5000/api';
+        
+        // Check if running through Flask server or direct file access
+        const isFlaskServer = window.location.protocol === 'http:' || window.location.protocol === 'https:';
+        
+        // Redirect if already logged in (only for direct file access)
+        if (!isFlaskServer) {
+            (function(){
+                try { if (localStorage.getItem('safeguard_logged_in')) { window.location.replace('index.html'); } } catch(e){}
+            })();
+        }
+        
+        let currentUser = null;
+
+        // Security questions mapping
+        const securityQuestions = {
+            'first_pet': 'What was the name of your first pet?',
+            'birth_city': 'In which city were you born?',
+            'school_name': 'What was the name of your elementary school?',
+            'mother_maiden': 'What is your mother\'s maiden name?',
+            'first_car': 'What was your first car model?',
+            'favorite_teacher': 'Who was your favorite teacher?'
+        };
+
+        // API Helper Functions
+        async function apiRequest(endpoint, method = 'GET', data = null) {
+            try {
+                const options = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                };
+                
+                if (data) {
+                    options.body = JSON.stringify(data);
+                }
+                
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+                
+                // Handle network errors
+                if (!response.ok && response.status === 0) {
+                    throw new Error('Cannot connect to server. Please make sure the Flask server is running on http://127.0.0.1:5000');
+                }
+                
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.message || 'Request failed');
+                }
+                
+                return result;
+            } catch (error) {
+                console.error('API Error:', error);
+                // Check if it's a network error
+                if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                    throw new Error('Cannot connect to server. Please make sure the Flask server is running on http://127.0.0.1:5000');
+                }
+                throw error;
+            }
+        }
+
+        // Check server connection on page load
+        async function checkServerConnection() {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/');
+                if (response.ok) {
+                    console.log('✅ Connected to Flask backend');
+                    return true;
+                }
+            } catch (error) {
+                console.warn('⚠️ Flask server not running. Some features may not work.');
+                console.warn('Please start the Flask server by running: python app.py');
+                return false;
+            }
+        }
+
+        // Check connection when page loads
+        checkServerConnection();
+
+        // Show/Hide forms
+        function showLogin() {
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('forgotPasswordForm').classList.add('hidden');
+            document.getElementById('successPage').classList.add('hidden');
+        }
+
+        function showRegister() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.remove('hidden');
+            document.getElementById('forgotPasswordForm').classList.add('hidden');
+            document.getElementById('successPage').classList.add('hidden');
+        }
+
+        function showForgotPassword() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('forgotPasswordForm').classList.remove('hidden');
+            document.getElementById('successPage').classList.add('hidden');
+        }
+
+        function showSuccessPage() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('forgotPasswordForm').classList.add('hidden');
+            document.getElementById('successPage').classList.remove('hidden');
+        }
+
+        // Toggle password visibility
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const toggle = field.nextElementSibling;
+            
+            if (field.type === 'password') {
+                field.type = 'text';
+                toggle.textContent = '🙈';
+            } else {
+                field.type = 'password';
+                toggle.textContent = '👁️';
+            }
+        }
+
+        // Password strength checker
+        function checkPasswordStrength(password) {
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[a-z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            
+            return strength;
+        }
+
+        // Update password strength indicator
+        document.getElementById('registerPassword').addEventListener('input', function() {
+            const password = this.value;
+            const strengthBar = document.querySelector('.password-strength');
+            const strengthText = document.getElementById('strengthText');
+            const strength = checkPasswordStrength(password);
+            
+            strengthBar.className = 'password-strength';
+            
+            if (strength < 3) {
+                strengthBar.classList.add('strength-weak');
+                strengthText.textContent = 'Weak';
+            } else if (strength < 4) {
+                strengthBar.classList.add('strength-medium');
+                strengthText.textContent = 'Medium';
+            } else {
+                strengthBar.classList.add('strength-strong');
+                strengthText.textContent = 'Strong';
+            }
+        });
+
+        // Show alert message
+        function showAlert(containerId, message, type) {
+            const alertDiv = document.getElementById(containerId);
+            alertDiv.textContent = message;
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.classList.remove('hidden');
+            
+            setTimeout(() => {
+                alertDiv.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Registration form handler
+        document.getElementById('registerFormElement').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const userData = {
+                username: formData.get('username'),
+                name: formData.get('name'),
+                email: formData.get('email'),
+                securityQuestion: formData.get('securityQuestion'),
+                securityAnswer: formData.get('securityAnswer').toLowerCase(),
+                password: formData.get('password')
+            };
+
+            // Validate password strength
+            if (checkPasswordStrength(userData.password) < 3) {
+                showAlert('registerAlert', 'Password is too weak. Please use at least 8 characters with uppercase, lowercase, and numbers.', 'error');
+                return;
+            }
+
+            // Show loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating Account...';
+
+            try {
+                const result = await apiRequest('/register', 'POST', userData);
+                
+                showAlert('registerAlert', 'Account created successfully! You can now login with your username.', 'success');
+                
+                // Auto-fill login form and switch to login
+                setTimeout(() => {
+                    document.getElementById('loginUsername').value = userData.username;
+                    showLogin();
+                }, 2000);
+            } catch (error) {
+                showAlert('registerAlert', error.message || 'Registration failed. Please try again.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        });
+
+        // Login form handler
+        document.getElementById('loginFormElement').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const username = formData.get('username');
+            const password = formData.get('password');
+
+            // Show loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Signing In...';
+
+            try {
+                const result = await apiRequest('/login', 'POST', { username, password });
+                
+                if (result.status === 'success') {
+                    currentUser = result.user;
+                    // Store user info in localStorage for session management
+                    try {
+                        localStorage.setItem('safeguard_logged_in', '1');
+                        localStorage.setItem('safeguard_user', JSON.stringify(result.user));
+                    } catch(e) {
+                        console.error('LocalStorage error:', e);
+                    }
+                    showSuccessPage();
+                } else {
+                    showAlert('loginAlert', result.message || 'Login failed. Please try again.', 'error');
+                }
+            } catch (error) {
+                showAlert('loginAlert', error.message || 'Invalid username or password. Please try again.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        });
+
+        // Verify user for password reset
+        async function verifyUser() {
+            const email = document.getElementById('forgotEmail').value;
+            
+            if (!email) {
+                showAlert('forgotAlert', 'Please enter your email address.', 'error');
+                return;
+            }
+
+            const verifyBtn = document.querySelector('#forgotPasswordFormElement button[type="button"]');
+            const originalText = verifyBtn.textContent;
+            verifyBtn.disabled = true;
+            verifyBtn.textContent = 'Verifying...';
+
+            try {
+                const result = await apiRequest('/verify-email', 'POST', { email });
+                
+                if (result.status === 'success') {
+                    const questionKey = result.securityQuestion;
+                    const questionText = securityQuestions[questionKey] || questionKey;
+                    
+                    document.getElementById('securityQuestionText').textContent = questionText;
+                    document.getElementById('securityQuestionSection').classList.remove('hidden');
+                    showAlert('forgotAlert', 'Identity verified! Please answer your security question.', 'success');
+                } else {
+                    showAlert('forgotAlert', result.message || 'Email address not found.', 'error');
+                }
+            } catch (error) {
+                showAlert('forgotAlert', error.message || 'Email address not found in our records.', 'error');
+            } finally {
+                verifyBtn.disabled = false;
+                verifyBtn.textContent = originalText;
+            }
+        }
+
+        // Forgot password form handler
+        document.getElementById('forgotPasswordFormElement').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('forgotEmail').value;
+            const securityAnswer = document.getElementById('securityAnswerInput').value.toLowerCase();
+            const newPassword = document.getElementById('newPassword').value;
+
+            // Validate password strength
+            if (checkPasswordStrength(newPassword) < 3) {
+                showAlert('forgotAlert', 'Password is too weak. Please use at least 8 characters with uppercase, lowercase, and numbers.', 'error');
+                return;
+            }
+
+            // Show loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Resetting Password...';
+
+            try {
+                const result = await apiRequest('/reset-password', 'POST', {
+                    email: email,
+                    securityAnswer: securityAnswer,
+                    newPassword: newPassword
+                });
+                
+                if (result.status === 'success') {
+                    showAlert('forgotAlert', 'Password reset successfully! You can now login with your new password.', 'success');
+                    
+                    // Get username from email (we'll need to fetch it or store it)
+                    // For now, just redirect to login
+                    setTimeout(() => {
+                        showLogin();
+                    }, 2000);
+                } else {
+                    showAlert('forgotAlert', result.message || 'Password reset failed. Please try again.', 'error');
+                }
+            } catch (error) {
+                showAlert('forgotAlert', error.message || 'Incorrect security answer. Please try again.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        });
+
+        // After success page, go to main UI
+        (function(){
+            const successBtn = document.querySelector('#successPage .btn-primary');
+            successBtn.addEventListener('click', function(){
+                window.location.replace('index.html');
+            });
+        })();
+    </script>
+</body>
+</html>
